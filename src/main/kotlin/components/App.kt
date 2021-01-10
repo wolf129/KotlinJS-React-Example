@@ -1,5 +1,6 @@
 package components
 
+import mappers.Counter
 import models.AdminState
 import models.CounterType
 import models.UserState
@@ -17,10 +18,10 @@ val store = configureStore()
 val App = functionalComponent<RProps> {
   provider(store) {
     styledDiv {
-      mappers.Counter {
+      Counter {
         attrs.counterType = CounterType.COUNTER1
       }
-      mappers.Counter {
+      Counter {
         attrs.counterType = CounterType.COUNTER2
       }
     }

@@ -37,28 +37,24 @@ interface CounterProps : RProps {
   var setCounter: (Int) -> Unit
 }
 
-
-val mapStateToProps: CounterStateProps.(AppState, CounterOwnProps) -> Unit = { state, ownProps ->
-  counter = when (ownProps.counterType) {
-    CounterType.COUNTER1 -> getCounter1(state)
-    CounterType.COUNTER2 -> getCounter2(state)
+object CounterMapper: Mapping<CounterOwnProps, CounterStateProps, CounterDispatchProps, CounterProps, CounterComponent> {
+  override val mapStateToProps: CounterStateProps.(AppState, CounterOwnProps) -> Unit = { state, ownProps ->
+    counter = when (ownProps.counterType) {
+      CounterType.COUNTER1 -> getCounter1(state)
+      CounterType.COUNTER2 -> getCounter2(state)
+    }
+    counterType = ownProps.counterType
   }
-  counterType = ownProps.counterType
-}
-
-val mapDispatchToProps: CounterDispatchProps.(Dispatch, CounterOwnProps) -> Unit =
-  { dispatch, ownProps ->
-    setCounter = {
-      when(ownProps.counterType) {
-        CounterType.COUNTER1 -> { dispatch(LoadList()); dispatch(SetButton1Counter(it)) }
-        CounterType.COUNTER2 -> dispatch(SetButton2Counter(it))
+  override val mapDispatchToProps: CounterDispatchProps.(Dispatch, CounterOwnProps) -> Unit =
+    { dispatch, ownProps ->
+      setCounter = {
+        when(ownProps.counterType) {
+          CounterType.COUNTER1 -> { dispatch(LoadList()); dispatch(SetButton1Counter(it)) }
+          CounterType.COUNTER2 -> dispatch(SetButton2Counter(it))
+        }
       }
     }
-  }
+  override val connector: RClass<CounterOwnProps> = createDefault(CounterComponent::class)
+}
 
-
-val Counter: RClass<CounterOwnProps> =
-  rConnect<AppState, RAction, WrapperAction, CounterOwnProps, CounterStateProps, CounterDispatchProps, CounterProps>(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(CounterComponent::class.rClass)
+val Counter = CounterMapper.connector
